@@ -263,6 +263,18 @@ def test_parse_file():
     assert assembly_comments('/* line1\nline2\n*/line3\n') == ['/* line1\n', 'line2\n', '*/     \n']
 
 
+def test_assembly_hash_comments():
+    """Test that # works as line comment delimiter for assembly"""
+    assert assembly_comments('# comment\ncode\n') == ['# comment\n', '    \n']
+    assert assembly_comments('# hash comment\n') == ['# hash comment\n']
+
+
+def test_assembly_mixed_comments():
+    """Test that both ; and # work together in assembly"""
+    assert assembly_comments('; semicolon comment\n# hash comment\ncode\n') == ['; semicolon comment\n', '# hash comment\n', '    \n']
+    assert assembly_comments('code ; inline semicolon\ncode # inline hash\n') == ['     ; inline semicolon\n', '     # inline hash\n']
+
+
 def test_parse_comments_via_reduce():
     def f(st, x):
         st.line = x

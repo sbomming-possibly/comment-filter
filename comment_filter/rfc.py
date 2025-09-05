@@ -160,15 +160,16 @@ def parse_code(lang, state):
     while True:
         line = state.line
         multi_start_tokens = [start for start, end in lang.comment_bookends]
-        tokens = multi_start_tokens + [
-            lang.line_comment,
+        tokens = multi_start_tokens + lang.line_comment + [
             lang.string_literal_start,
             lang.string_literal2_start]
         i = index_of_first_found(line, tokens)
         if i != -1:
             state.line = line[i:]
             code += line[:i]
-            if line.startswith(lang.line_comment, i) or \
+            # Check if any line comment delimiter starts at position i
+            line_comment_found = line.startswith(tuple(lang.line_comment), i)
+            if line_comment_found or \
                     index_of_first_found(line, multi_start_tokens) == i:
                 return code, state
             elif line.startswith(lang.string_literal_start, i):
@@ -274,15 +275,15 @@ def parse_line_comment(lang, state, keep_tokens=True):
       (string, State)
     """
     line = state.line
-    line_comment = lang.line_comment
-    if line.startswith(line_comment):
-        state.line = ''
-        i = len(line_comment)
-        if not keep_tokens:
-            line_comment = ' ' * i
-        return line_comment + line[i:], state
-    else:
-        return '', state
+    # Check each possible line comment delimiter
+    for line_comment in lang.line_comment:
+        if line.startswith(line_comment):
+            state.line = ''
+            i = len(line_comment)
+            if not keep_tokens:
+                line_comment = ' ' * i
+            return line_comment + line[i:], state
+    return '', state
 
 
 def parse_multiline_comment(lang, state, keep_tokens=True):
