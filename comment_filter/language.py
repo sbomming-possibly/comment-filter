@@ -3,7 +3,11 @@
 
 class Lang:
     def __init__(self, line_comment, comment_bookends, nested_comments):
-        self.line_comment = line_comment
+        # Support both single string and list of strings for line_comment
+        if isinstance(line_comment, str):
+            self.line_comment = [line_comment]
+        else:
+            self.line_comment = line_comment
         self.comment_bookends = comment_bookends
         self.nested_comments = nested_comments
         self.string_literal_start = '"'
@@ -15,7 +19,7 @@ c = Lang(
     nested_comments=False)
 
 assembly = Lang(
-    line_comment=';',
+    line_comment=';', 
     comment_bookends=[('/*', '*/')],
     nested_comments=False)
 
