@@ -168,7 +168,7 @@ def parse_code(lang, state):
             state.line = line[i:]
             code += line[:i]
             # Check if any line comment delimiter starts at position i
-            line_comment_found = any(line.startswith(lc, i) for lc in lang.line_comment)
+            line_comment_found = line.startswith(tuple(lang.line_comment), i)
             if line_comment_found or \
                     index_of_first_found(line, multi_start_tokens) == i:
                 return code, state
